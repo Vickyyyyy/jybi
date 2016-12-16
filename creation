@@ -1,0 +1,356 @@
+//--------------------红外的上下左右键控制灯的开关
+#include<IRremote.h>
+#define IR_PIN 6//接红外引脚
+decode_results results;
+
+IRrecv irrecv(IR_PIN);
+#define irhead 33464415//-------------------上下左右键的编码，可以增加
+#define irback 33478695
+#define irleft 33480735
+#define irright 33460335
+#define irA 33456255
+#define irB 33439935
+#define OUT1A 8//-----------------------接led的引脚
+#define OUT1B 9//接led的引脚
+#define OUT2A 10//接led的引脚
+#define OUT2B 11//接led的引脚
+#define OUT3A 12
+#define OUT3B 13
+
+//----------------流水灯中的代码
+int LED1=8;
+
+ int LED2=9;
+
+ int LED3=10;
+
+ int LED4=11;
+
+ int LED5=12;
+
+ int LED6=13;
+
+ int n;
+//---------------------------------------
+void left()//------------------------下面是6个控制灯的函数
+{
+  digitalWrite(OUT1A, HIGH);
+  digitalWrite(OUT1B, LOW);
+  digitalWrite(OUT2A, LOW);
+  digitalWrite(OUT2B, LOW);
+  digitalWrite(OUT3A, LOW);
+  digitalWrite(OUT3B, HIGH);
+}
+void right()
+{
+  digitalWrite(OUT1A, LOW);
+  digitalWrite(OUT1B, HIGH);
+  digitalWrite(OUT2A, LOW);
+  digitalWrite(OUT2B, LOW);
+  digitalWrite(OUT3A, LOW);
+  digitalWrite(OUT3B, LOW);
+}
+
+void back()
+{
+ digitalWrite(OUT1A,LOW);
+ digitalWrite(OUT1B,LOW);
+ digitalWrite(OUT2A,LOW);
+ digitalWrite(OUT2B,HIGH);
+ digitalWrite(OUT3A, LOW);
+ digitalWrite(OUT3B, LOW);
+  }
+
+void head()
+{
+ digitalWrite(OUT1A,LOW);
+ digitalWrite(OUT1B,LOW);
+ digitalWrite(OUT2A,HIGH);
+ digitalWrite(OUT2B,LOW);
+ digitalWrite(OUT3A, LOW);
+ digitalWrite(OUT3B, LOW);
+
+  }
+void B()
+{
+ digitalWrite(OUT1A,HIGH);
+ digitalWrite(OUT1B,HIGH);
+ digitalWrite(OUT2A,LOW);
+ digitalWrite(OUT2B,LOW);
+ digitalWrite(OUT3A, HIGH);
+ digitalWrite(OUT3B, HIGH);
+
+  }
+void STOP()
+{
+ digitalWrite(OUT1A,HIGH);
+ digitalWrite(OUT1B,HIGH);
+ digitalWrite(OUT2A,HIGH);
+ digitalWrite(OUT2B,HIGH);
+ digitalWrite(OUT3A,HIGH);
+ digitalWrite(OUT3B,HIGH);
+
+  }
+
+
+  void period5()//红外遥控
+  {
+      
+      if (irrecv.decode(&results)){
+    Serial.println(results.value,DEC);
+  switch(results.value)
+  {
+  
+  case irhead:
+  head();
+  Serial.println("HEAD");
+  delay(3000);
+  STOP();
+  break;
+
+   case irback:
+  back();
+  Serial.println("BACK");
+  delay(3000);
+  STOP();
+  break;
+
+ case irleft:
+  left();
+  Serial.println("LEFT");
+  delay(3000);
+  STOP();
+  break;
+
+   case irright:
+  right();
+  Serial.println("RIGHT");
+  delay(3000);
+  STOP();
+  break;
+  
+  case irB:
+  B();
+  Serial.println("B");
+  delay(3000);
+  STOP();
+  break;
+  
+  case irA:
+  liushuideng();
+  Serial.println("RIGHT");
+  delay(3000);
+  STOP();
+  break;
+  
+  }
+  
+  irrecv.resume();
+  }
+    }
+
+    
+
+void setup()
+{
+  pinMode(OUT1A, OUTPUT);//驱动
+  pinMode(OUT1B, OUTPUT);
+  pinMode(OUT2A, OUTPUT);
+  pinMode(OUT2B, OUTPUT);
+  pinMode(OUT3A, OUTPUT);
+  pinMode(OUT3B, OUTPUT);
+  Serial.begin(9600);  // 初始化串口通信及连接SR04的引脚
+  irrecv.enableIRIn();//启动遥控器
+  
+  //一下为流水灯的setup函数中的代码
+  /*
+  for(n=8;n<=13;n++)
+
+{
+
+  pinMode(n, OUTPUT);  
+
+}
+*/
+}
+
+
+void loop()
+{
+  period5();
+
+  }
+
+//-------------以下为流水灯的源码
+//因为红外遥控中有setup、loop函数，
+//所以要用流水灯的loop函数替换原来红外遥控中的loop函数
+//loop函数处理：这里只需把红外遥控中的loop函数代码注释掉即可
+//setup函数处理：把流水灯里setup函数的内容放到红外遥控的setup函数即可，注释掉流水灯setup函数代码
+/*
+void setup()
+
+{ //设置各个引脚的初始状态 
+
+for(n=8;n<=13;n++)
+
+{
+
+  pinMode(n, OUTPUT);  
+
+}
+
+}
+*/
+/*
+void loop() 
+
+{
+
+  liushuideng();
+
+} 
+*/
+
+void liushuideng()  //流水灯
+{
+  turn1();//顺序点亮，顺序熄灭
+
+  clean();  //灭掉所有灯
+
+  
+
+  turn2();//6灯齐闪
+
+  clean();//灭掉所有灯
+
+  
+
+  turn3();
+
+  clean();//灭掉所有灯
+}
+
+void turn1()  //顺序点亮，顺序熄灭
+
+{
+
+  for(n=8;n<=13;n++)
+
+{
+
+    digitalWrite(n,HIGH);
+
+    delay(300);
+
+}
+
+  for(n=8;n<=13;n++)
+
+{
+
+    digitalWrite(n,LOW);
+
+    delay(300);
+
+}
+
+}
+
+void turn2()//6灯齐闪3次
+
+{ for(int x=0;x<=2;x++)
+
+{
+
+  for(n=8;n<=13;n++)
+
+{
+
+    digitalWrite(n,HIGH);   
+
+}
+
+delay(300); 
+
+  for(n=8;n<=13;n++)
+
+{
+
+    digitalWrite(n,LOW);
+
+    
+
+}
+
+delay(300);
+
+}
+
+}
+
+void turn3()//两个两个一起闪3次
+
+{
+
+  for(int x=0;x<=2;x++)
+
+  {
+
+  digitalWrite(8,HIGH);
+
+  digitalWrite(9,HIGH);
+
+  for(n=10;n<=13;n++){
+
+    digitalWrite(n,LOW);
+
+  }
+
+  delay(300);
+
+  digitalWrite(10,HIGH);
+
+  digitalWrite(11,HIGH);
+
+  digitalWrite(8,LOW);
+
+  digitalWrite(9,LOW);
+
+  digitalWrite(12,LOW);
+
+  digitalWrite(13,LOW);
+
+  delay(300);
+
+  digitalWrite(12,HIGH);
+
+  digitalWrite(13,HIGH);
+
+  for(n=6;n<=11;n++){
+
+    digitalWrite(n,LOW);
+
+  }
+
+  delay(300);
+
+}
+
+}
+
+void clean()
+
+{  for(n=8;n<=13;n++)
+
+{
+
+    digitalWrite(n,LOW);
+
+    
+
+}
+
+delay(300);
+
+}
+
